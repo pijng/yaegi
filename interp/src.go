@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/pijng/goinject"
 )
 
 // importSrc calls gta on the source code for the package identified by
@@ -196,6 +198,12 @@ func (interp *Interpreter) rootFromSourceLocation() (string, error) {
 // pkgDir returns the absolute path in filesystem for a package given its import path
 // and the root of the subtree dependencies.
 func (interp *Interpreter) pkgDir(goPath string, root, importPath string) (string, string, error) {
+	res, err := goinject.ResolvePkg(importPath)
+	if err != nil {
+		panic(fmt.Errorf("WOW: %w", err))
+	}
+
+	fmt.Println(res)
 	rPath := filepath.Join(root, "vendor")
 	dir := filepath.Join(goPath, "src", rPath, importPath)
 
