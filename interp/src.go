@@ -200,7 +200,7 @@ func (interp *Interpreter) rootFromSourceLocation() (string, error) {
 func (interp *Interpreter) pkgDir(goPath string, root, importPath string) (string, string, error) {
 	res, err := goinject.ResolvePkg(importPath)
 	if err != nil {
-		panic(fmt.Errorf("WOW: %w", err))
+		panic(fmt.Errorf("%s ==== %w", importPath, err))
 	}
 
 	fmt.Println(res)
