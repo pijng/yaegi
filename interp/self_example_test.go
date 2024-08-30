@@ -3,8 +3,8 @@ package interp_test
 import (
 	"log"
 
-	"github.com/traefik/yaegi/interp"
-	"github.com/traefik/yaegi/stdlib"
+	"github.com/pijng/yaegi/interp"
+	"github.com/pijng/yaegi/stdlib"
 )
 
 func ExampleInterpreter_self() {
