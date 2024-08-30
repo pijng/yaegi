@@ -1,4 +1,4 @@
-module github.com/traefik/yaegi
+module github.com/pijng/yaegi
 
 go 1.22.0
 
