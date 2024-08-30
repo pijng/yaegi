@@ -1,14 +1,14 @@
 package interp
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/pijng/goinject"
 )
 
 // importSrc calls gta on the source code for the package identified by
@@ -198,14 +198,13 @@ func (interp *Interpreter) rootFromSourceLocation() (string, error) {
 // pkgDir returns the absolute path in filesystem for a package given its import path
 // and the root of the subtree dependencies.
 func (interp *Interpreter) pkgDir(goPath string, root, importPath string) (string, string, error) {
-	res, err := goinject.ResolvePkg(importPath)
-	if err != nil {
-		panic(fmt.Errorf("%s ==== %w", importPath, err))
+	dir, ok := pkgModDir(importPath)
+	if ok {
+		return dir, root, nil
 	}
 
-	fmt.Println(res)
 	rPath := filepath.Join(root, "vendor")
-	dir := filepath.Join(goPath, "src", rPath, importPath)
+	dir = filepath.Join(goPath, "src", rPath, importPath)
 
 	if _, err := fs.Stat(interp.opt.filesystem, dir); err == nil {
 		return dir, rPath, nil // found!
@@ -231,6 +230,24 @@ func (interp *Interpreter) pkgDir(goPath string, root, importPath string) (strin
 	}
 
 	return interp.pkgDir(goPath, prevRoot, importPath)
+}
+
+func pkgModDir(packageName string) (string, bool) {
+	cmd := exec.Command("go", "list", "-f", "{{.Dir}}", packageName)
+
+	var out bytes.Buffer
+	cmd.Stdout = &out
+
+	if err := cmd.Run(); err != nil {
+		return "", false
+	}
+
+	dir := strings.TrimSpace(out.String())
+	if dir == "" {
+		return "", false
+	}
+
+	return dir, true
 }
 
 const vendor = "vendor"
